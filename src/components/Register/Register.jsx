@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from 'firebase/auth';
 import app from '../../firebase/firebase.config';
+import { Link } from 'react-router-dom';
 
 const Register = () => {
     // auth for firebase
@@ -54,7 +55,8 @@ const Register = () => {
                 // after successfully register clear form data
                 e.target.reset();
                 // set success message
-                setSuccess('User has registered successfully')
+                setSuccess('User has registered successfully');
+                sendVerificationEmail(loggedUser)
             })
             .catch(error => {
                 console.error(error.message)
@@ -62,17 +64,26 @@ const Register = () => {
             })
     }
 
+    // for verify an email address we send a verification email to the currentUser Email address
+    const sendVerificationEmail = (user)=>{
+        sendEmailVerification(user)
+        .then(result =>{
+            alert('Please verify your email address');
+        })
+    } 
+
 
     return (
         <div className='w-50 mx-auto mt-5'>
-            <h2>Register</h2>
-            <p className='text-success'>{success}</p>
+            <h2 className='text-success'>Register</h2>
             <form onSubmit={handleSubmit} action="">
                 <input className='w-50 rounded ps-2 mb-2' required onChange={handleEmail} type="email" name="email" id="email" placeholder='Email' /><br />
                 <input className='w-50 rounded ps-2 mb-2' required onBlur={handlePass} type="password" name="password" id="password" placeholder='Password' /><br />
                 <input type="submit" value="Register" />
             </form>
+            <p className='small'>Already Registered? <Link to='/login'>Login</Link></p>
             <p className='text-danger'>{error}</p>
+            <p className='text-success'>{success}</p>
         </div>
     );
 };
