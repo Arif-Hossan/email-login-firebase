@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-unused-vars
+
 import React, { useState } from 'react';
 
 const Register = () => {
@@ -18,6 +18,7 @@ const Register = () => {
     }
     // onSubmit event for form field
     const handleSubmit = (e) => {
+        // if we click submit button then the page automatically reload for prevent this event we use preventDefault function
         e.preventDefault();
         const email = e.target.email.value;
         const pass = e.target.password.value;
