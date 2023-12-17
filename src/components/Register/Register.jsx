@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, updateProfile } from 'firebase/auth';
 import app from '../../firebase/firebase.config';
 import { Link } from 'react-router-dom';
 
@@ -34,6 +34,7 @@ const Register = () => {
         setError('');
         const email = e.target.email.value;
         const pass = e.target.password.value;
+        const name = e.target.name.value;
         
         // (?=.* [0 - 9]) means that the password must contain a single digit from 1 to 9.
         // (?=.* [a - z]) means that the password must contain one lowercase letter.
@@ -45,7 +46,7 @@ const Register = () => {
             setError('please use strong password');
             return;
         }
-        console.log(email, pass);
+        console.log(name,email, pass);
         // create user and authentication using firebase
         createUserWithEmailAndPassword(auth, email, pass)
             .then(userCredential => {
@@ -56,7 +57,8 @@ const Register = () => {
                 e.target.reset();
                 // set success message
                 setSuccess('User has registered successfully');
-                sendVerificationEmail(loggedUser)
+                sendVerificationEmail(loggedUser);
+                updateUserData(loggedUser,name);
             })
             .catch(error => {
                 console.error(error.message)
@@ -72,12 +74,26 @@ const Register = () => {
         })
     } 
 
+    // update user data
+    const updateUserData = (user, name) => {
+        updateProfile(user, 
+            {displayName :name})
+            .then(()=>{
+                console.log('user name updated');
+                console.log(user);
+            })
+            .catch(error => {
+                setError(error.message);
+            })
+    }
+
 
     return (
         <div className='w-50 mx-auto mt-5'>
             <h2 className='text-success'>Register</h2>
             <form onSubmit={handleSubmit} action="">
-                <input className='w-50 rounded ps-2 mb-2' required onChange={handleEmail} type="email" name="email" id="email" placeholder='Email' /><br />
+                <input className='w-50 rounded ps-2 mb-2' required  type="text" name="name" id="name" placeholder='Name' /><br />
+                <input className='w-50 rounded ps-2 mb-2' required onChange={handleEmail} type="email" name="email" id="email" placeholder='Email'/><br />
                 <input className='w-50 rounded ps-2 mb-2' required onBlur={handlePass} type="password" name="password" id="password" placeholder='Password' /><br />
                 <input type="submit" value="Register" />
             </form>

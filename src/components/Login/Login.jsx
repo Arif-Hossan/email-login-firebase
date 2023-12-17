@@ -1,5 +1,5 @@
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import React, { useState } from 'react';
+import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useRef, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
@@ -12,6 +12,10 @@ const Login = () => {
     const [error, setError] = useState('');
     // success state
     const [success, setSuccess] = useState('');
+
+    // useRef using for creating a instance of email for send email for forget password
+    const emailRef = useRef('');
+
     const handleSubmit = e => {
         e.preventDefault();
         const form = e.target;
@@ -49,13 +53,34 @@ const Login = () => {
             })
 
     }
+
+    // send reset password email
+    const handleResetPassword = event => {
+        event.preventDefault();
+        setError('');
+        
+        const email = emailRef.current?.value;
+        if(!email){
+            alert("Please provide your email to reset password");
+        }
+        
+        sendPasswordResetEmail(auth,email)
+        .then(()=>{
+            alert("Check your email")
+        })
+        .catch(error => {
+            setError(error.message);
+        })
+      
+        
+    }
     return (
         <div className='w-50 mx-auto mt-5'>
             <h4 className='text-primary'>Login</h4>
             <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label>Email address</Form.Label>
-                    <Form.Control type="email" name="email" placeholder="Enter email" required />
+                    <Form.Control type="email" ref={emailRef} name="email" placeholder="Enter email" required />
 
                 </Form.Group>
 
@@ -67,6 +92,7 @@ const Login = () => {
                     Submit
                 </Button>
             </Form>
+            <p className='small'>Forget Password ? <Link onClick={handleResetPassword}>Reset Password</Link></p>
             <p className='small'>Are you new to this Website ? <Link to='/register'>Register</Link></p>
             <p className='text-success'>{success}</p>
             <p className='text-danger'>{error}</p>
